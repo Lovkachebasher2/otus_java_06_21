@@ -1,2 +1,4 @@
 # otus_java_06_21
-repository for home work otus
+Студент:
+Roman Karavashkin(Роман Каравашкин)
+delicious.blizzard.moon@gmail.com
