@@ -1,0 +1,3 @@
+rootProject.name = 'mainRepo'
+include 'hw01-gradle'
+
