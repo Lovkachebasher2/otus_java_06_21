@@ -1,7 +1,6 @@
 package com.example.homework;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -17,16 +16,7 @@ public class CustomerService {
     }
 
     public Map.Entry<Customer, String> getNext(Customer customer) {
-        treeMap.put(customer, " ");
-        Iterator<Map.Entry<Customer, String>> iterator = treeMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Customer, String> EntryCustomer = iterator.next();
-            Customer customer1 = EntryCustomer.getKey();
-            if (customer1 == customer && iterator.hasNext()) {
-                return iterator.next();
-            }
-        }
-        return null;
+        return treeMap.higherEntry(customer);
     }
 
     public void add(Customer customer, String data) {

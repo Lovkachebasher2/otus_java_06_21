@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Customer {
 
     private final Long id;
-    private final String name;
+    private String name;
     private Long scores;
 
     //TODO: 1. в этом классе надо исправить ошибки
@@ -32,7 +32,7 @@ public class Customer {
     }
 
     public void setScores(long scores) {
-        this.scores = scores;
+        new Customer(id, name, scores);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Customer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return id == customer.id ;
+        return Objects.equals(id, customer.id);
     }
 
     @Override
