@@ -32,7 +32,7 @@ public class CustomTestFramework {
         for (Method method : testingContext.getTestMethodList()) {
             boolean testIsDone = true;
             if (method == null) {
-                throw new NotExistException("method is null: " + method.getName());
+                throw new NotExistException("method is null");
             }
 
             if (testingContext.getBeforeMethod() != null) {
@@ -54,9 +54,8 @@ public class CustomTestFramework {
         TestingHelper.printStatistic(amountOfTest, passedTest);
     }
 
-    private static boolean invokeMethod(Method method, Object obj) throws InvocationTargetException, IllegalAccessException {
-        method.invoke(obj);
-        return true;
+    private static boolean invokeMethod(Method method, Object obj) {
+        return invoke(method, obj);
     }
 
     private static TestingContext getTestingContext(Method[] methods) {
@@ -65,5 +64,15 @@ public class CustomTestFramework {
                 .withAfterMethod(TestingHelper.getMethod(methods, After.class))
                 .withTestMethodList(TestingHelper.getMethods(methods, Test.class))
                 .build();
+    }
+
+    private static boolean invoke(Method method, Object obj) {
+        try {
+            method.invoke(obj);
+            return true;
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
