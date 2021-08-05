@@ -3,12 +3,12 @@ package com.example.homework.customtestframework;
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class MethodBuilder {
+public class TestingContext {
     private List<Method> testMethodList;
     private Method beforeMethod;
     private Method afterMethod;
 
-    private MethodBuilder() {
+    private TestingContext() {
 
     }
 
@@ -25,7 +25,7 @@ public class MethodBuilder {
     }
 
     public static Builder newBuilder() {
-        return new MethodBuilder().new Builder();
+        return new TestingContext().new Builder();
     }
 
     public class Builder {
@@ -34,22 +34,22 @@ public class MethodBuilder {
         }
 
         public Builder withTestMethodList(List<Method> testMethodList) {
-            MethodBuilder.this.testMethodList = testMethodList;
+            TestingContext.this.testMethodList = testMethodList;
             return this;
         }
 
         public Builder withBeforeMethod(Method method) {
-            MethodBuilder.this.beforeMethod = method;
+            TestingContext.this.beforeMethod = method;
             return this;
         }
 
         public Builder withAfterMethod(Method method) {
-            MethodBuilder.this.afterMethod = method;
+            TestingContext.this.afterMethod = method;
             return this;
         }
 
-        public MethodBuilder build() {
-            return MethodBuilder.this;
+        public TestingContext build() {
+            return TestingContext.this;
         }
     }
 }

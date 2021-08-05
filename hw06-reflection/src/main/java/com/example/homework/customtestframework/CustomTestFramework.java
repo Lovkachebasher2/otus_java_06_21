@@ -5,12 +5,10 @@ import com.example.homework.annotation.Before;
 import com.example.homework.annotation.Test;
 import com.example.homework.exception.ClazzCastException;
 import com.example.homework.exception.InvokeException;
+import com.example.homework.exception.NotExistException;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CustomTestFramework {
     public static void start(Class<?> clazz) {
@@ -20,90 +18,61 @@ public class CustomTestFramework {
     private static void run(Class<?> clazz) {
         try {
             runTestMethods(clazz);
-        } catch (ClazzCastException | InvokeException e) {
+        } catch (ClazzCastException | InvokeException | NotExistException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
-    private static void runTestMethods(Class<?> clazz) throws ClazzCastException, InvokeException {
-        Object obj = getObject(clazz);
+    private static void runTestMethods(Class<?> clazz) throws ClazzCastException, InvokeException, NotExistException, InvocationTargetException, IllegalAccessException {
+        Object obj = TestingHelper.getObject(clazz);
 
+        TestingContext testingContext = getTestingContext(obj.getClass().getMethods());
+        int amountOfTest = testingContext.getTestMethodList().size();
         int passedTest = 0;
-        int failedTest = 0;
-
-        MethodBuilder methodBuilder = getMethodBuilder(obj.getClass().getMethods());
-        for (Method method : methodBuilder.getTestMethodList()) {
+        for (Method method : testingContext.getTestMethodList()) {
             boolean testIsDone = true;
-            if (methodBuilder.getBeforeMethod() != null) {
-                testIsDone = invokeMethod(methodBuilder.getBeforeMethod(), obj);
+            if (method == null) {
+                throw new NotExistException("method is null");
             }
-            if (method != null && testIsDone) {
+
+            if (testingContext.getBeforeMethod() != null) {
+                testIsDone = invokeMethod(testingContext.getBeforeMethod(), obj);
+            }
+
+            if (testIsDone) {
                 testIsDone = invokeMethod(method, obj);
             }
 
-            if (methodBuilder.getAfterMethod() != null) {
-                invokeMethod(methodBuilder.getAfterMethod(), obj);
+            if (testingContext.getAfterMethod() != null) {
+                invokeMethod(testingContext.getAfterMethod(), obj);
             }
 
             if (testIsDone) {
                 passedTest++;
-            } else {
-                failedTest++;
             }
         }
-        printStatistic(passedTest, failedTest);
+        TestingHelper.printStatistic(amountOfTest, passedTest);
     }
 
-    private static boolean invokeMethod(Method method, Object obj) throws InvokeException {
-        boolean testIsDone = true;
-        try {
-            method.invoke(obj);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            testIsDone = false;
-            throw new InvokeException("failed invoke " + method.getName(), e);
-        }
-        return testIsDone;
+    private static boolean invokeMethod(Method method, Object obj) {
+        return invoke(method, obj);
     }
 
-    private static MethodBuilder getMethodBuilder(Method[] methods) {
-        return MethodBuilder.newBuilder()
-                .withBeforeMethod(getMethod(methods, Before.class))
-                .withAfterMethod(getMethod(methods, After.class))
-                .withTestMethodList(getMethods(methods, Test.class))
+    private static TestingContext getTestingContext(Method[] methods) {
+        return TestingContext.newBuilder()
+                .withBeforeMethod(TestingHelper.getMethod(methods, Before.class))
+                .withAfterMethod(TestingHelper.getMethod(methods, After.class))
+                .withTestMethodList(TestingHelper.getMethods(methods, Test.class))
                 .build();
     }
 
-    private static List<Method> getMethods(Method[] methods, Class<? extends Annotation> annotationClass) {
-        List<Method> testMethods = new ArrayList<>();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(annotationClass)) {
-                testMethods.add(method);
-            }
-        }
-        return testMethods;
-    }
-
-    private static Method getMethod(Method[] methods, Class<? extends Annotation> annotationClass) {
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(annotationClass)) {
-                return method;
-            }
-        }
-        return null;
-    }
-
-    private static void printStatistic(int passed, int failed) {
-        System.out.println("passed tests: " + passed);
-        System.out.println("failed tests: " + failed);
-    }
-
-    private static Object getObject(Class<?> clazz) throws ClazzCastException {
-        Object obj = null;
+    private static boolean invoke(Method method, Object obj) {
         try {
-            obj = clazz.getDeclaredConstructor().newInstance();
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-            throw new ClazzCastException(e);
+            method.invoke(obj);
+            return true;
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+            return false;
         }
-        return obj;
     }
 }
