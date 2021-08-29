@@ -3,5 +3,6 @@ include 'hw01-gradle'
 include 'hw03-qa'
 include 'hw04-GenericsAndCollection'
 include 'hw06-reflection'
+include 'hw07-gc'
 include 'hw10-bytecode'
 
