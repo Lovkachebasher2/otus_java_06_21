@@ -10,11 +10,6 @@ public class LogClass {
     }
 
     private void logger(Method method, Object[] args) {
-        StringBuilder stringBuilder = new StringBuilder("executed method: ")
-                .append(method.getName())
-                .append(", ")
-                .append("with parameters: ")
-                .append(Arrays.toString(args));
-        System.out.println(stringBuilder);
+        System.out.println("executed method: " + method.getName() + ", with parameters: " + Arrays.toString(args));
     }
 }
