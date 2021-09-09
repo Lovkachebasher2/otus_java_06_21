@@ -3,9 +3,12 @@ package example.homework.proxy.aop;
 import example.homework.proxy.utill.Log;
 import example.homework.proxy.utill.LogClass;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Ioc {
 
@@ -20,14 +23,17 @@ public class Ioc {
 
     static class DemoInvocationHandler implements InvocationHandler {
         private final MyClassInterface myClass;
+        private final Set<Method> annotationMethods;
 
         DemoInvocationHandler(MyClassInterface myClass) {
             this.myClass = myClass;
+            this.annotationMethods = getOnlyAnnotationMethods(
+                    Set.of(myClass.getClass().getDeclaredMethods()), Log.class);
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if  (method.isAnnotationPresent(Log.class)) {
+            if (annotationMethods.contains(method)) {
                 LogClass.log(method, args);
             }
             return method.invoke(myClass, args);
@@ -38,6 +44,12 @@ public class Ioc {
             return "DemoInvocationHandler{" +
                     "myClass=" + myClass +
                     '}';
+        }
+
+        private Set<Method> getOnlyAnnotationMethods(Set<Method> annotationMethodSet, Class<? extends Annotation> annotationClass) {
+            return annotationMethodSet.stream().filter(
+                    method -> method.isAnnotationPresent(annotationClass)
+            ).collect(Collectors.toSet());
         }
     }
 }
