@@ -1,21 +1,18 @@
 package example.homework.atm;
 
 import example.homework.atm.service.atmoperations.AtmServiceOperations;
+import example.homework.atm.service.atmoperations.Balance;
+import example.homework.atm.service.utill.BoundKit;
 
 public class Atm {
     private AtmServiceOperations atmServiceOperations;
-    private  int sum;
-
-    public Atm(int sum) {
-        this.sum = sum;
-    }
 
     public void setAtmServiceOperations(AtmServiceOperations atmServiceOperations) {
         this.atmServiceOperations = atmServiceOperations;
     }
 
     public void executeOperations(BoundKit boundKit) {
-        sum = this.atmServiceOperations.chooseBankAccountBalance(boundKit);
-        System.out.println("sum now: " + sum);
+        atmServiceOperations.operationsWithBankAccount(boundKit);
+        System.out.println("operation is successfully, balance now is: " + Balance.getBalance());
     }
 }

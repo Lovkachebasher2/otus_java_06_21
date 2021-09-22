@@ -1,8 +1,8 @@
 package example.homework.atm.service.atmoperations;
 
-import example.homework.atm.BoundKit;
+import example.homework.atm.service.utill.BoundKit;
 
 public interface AtmServiceOperations {
 
-    int chooseBankAccountBalance(BoundKit boundKit);
+    void operationsWithBankAccount(BoundKit boundKit);
 }

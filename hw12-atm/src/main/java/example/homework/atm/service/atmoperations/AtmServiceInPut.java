@@ -1,12 +1,11 @@
 package example.homework.atm.service.atmoperations;
 
-import example.homework.atm.BoundKit;
+import example.homework.atm.service.utill.BoundKit;
 
 public class AtmServiceInPut implements AtmServiceOperations{
 
     @Override
-    public int chooseBankAccountBalance(BoundKit boundKit) {
-        System.out.println("баланс пополнен");
-        return 0;
+    public void operationsWithBankAccount(BoundKit boundKit) {
+        Balance.addBalance(boundKit.getSum());
     }
 }
