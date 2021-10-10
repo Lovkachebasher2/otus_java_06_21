@@ -1,18 +1,25 @@
 package example.homework.atm;
 
-import example.homework.atm.service.atmoperations.AtmServiceOperations;
-import example.homework.atm.service.atmoperations.Balance;
-import example.homework.atm.service.utill.BoundKit;
+import example.homework.atm.balance.Balance;
+import example.homework.atm.service.AtmOperationService;
+import example.homework.atm.utill.Helper;
+import example.homework.atm.utill.OperationSum;
 
 public class Atm {
-    private AtmServiceOperations atmServiceOperations;
+    private AtmOperationService atmServiceOperations;
 
-    public void setAtmServiceOperations(AtmServiceOperations atmServiceOperations) {
+    public Atm(AtmOperationService atmServiceOperations) {
         this.atmServiceOperations = atmServiceOperations;
     }
 
-    public void executeOperations(BoundKit boundKit) {
-        atmServiceOperations.operationsWithBankAccount(boundKit);
-        System.out.println("operation is successfully, balance now is: " + Balance.getBalance());
+    public void addBankAccount(OperationSum operationSum) {
+        atmServiceOperations.addBankAccount(operationSum);
+        Helper.log("operation add bank account is successfully, balance now: " + Balance.getBalance());
+    }
+
+    public OperationSum outBankAccount(OperationSum operationSum) {
+        OperationSum operationResponseSum = atmServiceOperations.outBankAccount(operationSum);
+        Helper.log("you got it: " + operationSum.getThousand() + ".thousand, " + operationSum.getHundred() + ".hundred" + ". Balance now is: " + Balance.getBalance());
+        return operationResponseSum;
     }
 }
