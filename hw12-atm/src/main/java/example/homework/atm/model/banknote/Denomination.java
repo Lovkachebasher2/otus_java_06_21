@@ -12,6 +12,4 @@ public enum Denomination {
     Denomination(int value) {
         this.value = value;
     }
-
-
 }
