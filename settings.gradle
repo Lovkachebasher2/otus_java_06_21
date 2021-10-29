@@ -6,5 +6,4 @@ include 'hw06-reflection'
 include 'hw07-gc'
 include 'hw10-bytecode'
 include 'hw12-atm'
-include 'hw15-structuralPatterns:homework'
-include 'hw15-structuralPatterns:demo'
+
