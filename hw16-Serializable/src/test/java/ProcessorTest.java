@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,15 +24,9 @@ class ProcessorTest {
         //given
         var inputDataFileName = "inputData.json";
         var outputDataFileName = "outputData.json";
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resources = classLoader.getResource(inputDataFileName);
-
-        if (resources == null) {
-            throw new FileNotFoundException();
-        }
         var fullOutputFilePath = String.format("%s%s%s", tempDir, File.separator, outputDataFileName);
 
-        var loader = new FileLoader(resources.getFile());
+        var loader = new FileLoader(inputDataFileName);
         var processor = new ProcessorAggregator();
         var serializer = new FileSerializer(fullOutputFilePath);
 
