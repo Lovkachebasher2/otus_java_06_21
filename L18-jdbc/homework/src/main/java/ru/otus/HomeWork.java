@@ -63,13 +63,13 @@ public class HomeWork {
     }
 
     private static void flywayMigrations(DataSource dataSource) {
-        log.info("db migration started...");
-        var flyway = Flyway.configure()
-                .dataSource(dataSource)
-                .locations("classpath:/db/migration")
-                .load();
-        flyway.migrate();
-        log.info("db migration finished.");
-        log.info("***");
+//        log.info("db migration started...");
+//        var flyway = Flyway.configure()
+//                .dataSource(dataSource)
+//                .locations("classpath:/db/migration")
+//                .load();
+//        flyway.migrate();
+//        log.info("db migration finished.");
+//        log.info("***");
     }
 }
