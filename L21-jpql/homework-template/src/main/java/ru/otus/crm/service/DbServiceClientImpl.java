@@ -6,6 +6,7 @@ import ru.otus.core.repository.DataTemplate;
 import ru.otus.crm.model.Client;
 import ru.otus.core.sessionmanager.TransactionManager;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ public class DbServiceClientImpl implements DBServiceClient {
     public Optional<Client> getClient(long id) {
         return transactionManager.doInTransaction(session -> {
             var clientOptional = clientDataTemplate.findById(session, id);
+            session.setReadOnly(clientOptional, true);
             log.info("client: {}", clientOptional);
             return clientOptional;
         });
