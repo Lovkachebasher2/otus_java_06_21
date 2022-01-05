@@ -1,0 +1,52 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Пользователи</title>
+    <script>
+        function postClientData()
+        {
+            let obj = {};
+            obj.name = document.getElementById('clientNameTextBox').value
+            obj.phoneNumber = document.getElementById('clientPhoneNumberTextBox').value
+            obj.address = document.getElementById('clientAddressTextBox').value
+            fetch('clients', {
+                method: "POST",
+                body: JSON.stringify(obj)
+            })
+            window.location.reload();
+        }
+
+    </script>
+</head>
+
+<body >
+<#list clients>
+<table style="width: 400px">
+    <thead>
+    <tr>
+        <td style="width: 50px">Id</td>
+        <td style="width: 150px">Name</td>
+        <td style="width: 100px">Phone number</td>
+        <td style="width: 400px">Address</td>
+    </tr>
+    </thead>
+    <tbody>
+    <#items as client>
+    <tr>
+        <td>${client.id}</td>
+        <td>${client.name}</td>
+        <td>${client.phoneNumber}</td>
+        <td>${client.address}</td>
+    </tr>
+    </#items>
+    </tbody>
+</table>
+</#list>
+<h4>Add client</h4>
+<form>
+    <input type="text" id = "clientNameTextBox" placeholder="name">
+    <input type="text" id = "clientPhoneNumberTextBox" placeholder="phone number">
+    <input type="text" id = "clientAddressTextBox" placeholder="address">
+    <input type="submit" value="Create" onclick="postClientData()"/>
+</form>
+</body>
+</html>

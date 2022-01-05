@@ -7,15 +7,18 @@ import ru.otus.dao.core.repository.DataTemplateHibernate;
 import ru.otus.dao.core.repository.HibernateUtils;
 import ru.otus.dao.core.sessionmanager.TransactionManagerHibernate;
 import ru.otus.dao.crm.dbmigrations.MigrationsExecutorFlyway;
-import ru.otus.dao.crm.service.DBServiceUser;
-import ru.otus.dao.crm.service.DbServiceUserImpl;
-import ru.otus.model.User;
-import ru.otus.server.UsersWebServer;
-import ru.otus.server.UsersWebServerWithFilterBasedSecurity;
-import ru.otus.services.TemplateProcessor;
-import ru.otus.services.TemplateProcessorImpl;
-import ru.otus.services.UserAuthService;
-import ru.otus.services.UserAuthServiceImpl;
+import ru.otus.dao.crm.model.Client;
+import ru.otus.dao.crm.model.User;
+import ru.otus.dao.crm.services.client.DBServiceClient;
+import ru.otus.dao.crm.services.client.DBServiceClientImpl;
+import ru.otus.dao.crm.services.user.DBServiceUser;
+import ru.otus.dao.crm.services.user.DBServiceUserImpl;
+import ru.otus.server.ClientsWebServer;
+import ru.otus.server.ClientsWebServerWithFilterBasedSecurity;
+import ru.otus.dao.crm.services.TemplateProcessor;
+import ru.otus.dao.crm.services.TemplateProcessorImpl;
+import ru.otus.dao.crm.services.user.UserAuthService;
+import ru.otus.dao.crm.services.user.UserAuthServiceImpl;
 
 /*
     Полезные для демо ссылки
@@ -23,11 +26,11 @@ import ru.otus.services.UserAuthServiceImpl;
     // Стартовая страница
     http://localhost:8080
 
-    // Страница пользователей
-    http://localhost:8080/users
+    // Страница клиентов
+    http://localhost:8080/clients
 
     // REST сервис
-    http://localhost:8080/api/user/3
+    http://localhost:8080/api/clients/3
 */
 public class WebServerWithFilterBasedSecurityDemo {
     private static final int WEB_SERVER_PORT = 8080;
@@ -44,20 +47,22 @@ public class WebServerWithFilterBasedSecurityDemo {
         new MigrationsExecutorFlyway(dbUrl, dbUserName, dbPassword).executeMigrations();
 
 
-        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, User.class);
+        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, User.class, Client.class);
 
         var transactionManager = new TransactionManagerHibernate(sessionFactory);
 
         var userTemplate = new DataTemplateHibernate<>(User.class);
-        DBServiceUser userService = new DbServiceUserImpl(transactionManager, userTemplate);
+        var clientTemplate = new DataTemplateHibernate<>(Client.class);
+        DBServiceUser userService = new DBServiceUserImpl(transactionManager, userTemplate);
+        DBServiceClient clientService = new DBServiceClientImpl(transactionManager, clientTemplate);
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
         UserAuthService authService = new UserAuthServiceImpl(userService);
 
-        UsersWebServer usersWebServer = new UsersWebServerWithFilterBasedSecurity(WEB_SERVER_PORT,
-                authService, userService, gson, templateProcessor);
+        ClientsWebServer clientsWebServer = new ClientsWebServerWithFilterBasedSecurity(WEB_SERVER_PORT,
+                authService, clientService, gson, templateProcessor);
 
-        usersWebServer.start();
-        usersWebServer.join();
+        clientsWebServer.start();
+        clientsWebServer.join();
     }
 }

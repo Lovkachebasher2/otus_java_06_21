@@ -7,22 +7,24 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import ru.otus.dao.crm.service.DBServiceUser;
+import ru.otus.dao.crm.services.TemplateProcessor;
+import ru.otus.dao.crm.services.client.DBServiceClient;
 import ru.otus.helpers.FileSystemHelper;
-import ru.otus.services.TemplateProcessor;
-import ru.otus.servlet.UsersServlet;
+import ru.otus.servlet.ApiClient;
+import ru.otus.servlet.ClientServlet;
 
-public class UsersWebServerSimple implements UsersWebServer {
+public class ClientsWebServerSimple implements ClientsWebServer {
     private static final String START_PAGE_NAME = "index.html";
     private static final String COMMON_RESOURCES_DIR = "static";
 
-    private final DBServiceUser userService;
+    private final DBServiceClient clientService;
     private final Gson gson;
     protected final TemplateProcessor templateProcessor;
     private final Server server;
 
-    public UsersWebServerSimple(int port, DBServiceUser userService, Gson gson, TemplateProcessor templateProcessor) {
-        this.userService = userService;
+    public ClientsWebServerSimple(int port, DBServiceClient clientService, Gson gson, TemplateProcessor templateProcessor) {
+
+        this.clientService = clientService;
         this.gson = gson;
         this.templateProcessor = templateProcessor;
         server = new Server(port);
@@ -53,14 +55,14 @@ public class UsersWebServerSimple implements UsersWebServer {
 
         HandlerList handlers = new HandlerList();
         handlers.addHandler(resourceHandler);
-        handlers.addHandler(applySecurity(servletContextHandler, "/users"));
+        handlers.addHandler(applySecurity(servletContextHandler, "/clients", "/api/clients/*"));
 
 
         server.setHandler(handlers);
         return server;
     }
 
-    protected Handler applySecurity(ServletContextHandler servletContextHandler, String ...paths) {
+    protected Handler applySecurity(ServletContextHandler servletContextHandler, String... paths) {
         return servletContextHandler;
     }
 
@@ -74,7 +76,8 @@ public class UsersWebServerSimple implements UsersWebServer {
 
     private ServletContextHandler createServletContextHandler() {
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        servletContextHandler.addServlet(new ServletHolder(new UsersServlet(templateProcessor, userService, gson)), "/users");
+        servletContextHandler.addServlet(new ServletHolder(new ClientServlet(templateProcessor, clientService, gson)), "/clients");
+        servletContextHandler.addServlet(new ServletHolder(new ApiClient(gson, clientService)), "/api/clients/*");
         return servletContextHandler;
     }
 }
