@@ -49,7 +49,7 @@ class ClientsWebServerImplTest {
     private static final String DEFAULT_CLIENT_ADDRESS = "default address";
 
 
-    private static final Client DEFAULT_CLIENT = new Client(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_NAME, DEFAULT_CLIENT_PHONE_NUMBER, DEFAULT_CLIENT_ADDRESS);
+    private static final Client DEFAULT_CLIENT = new Client(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_NAME);
     private static final String INCORRECT_USER_LOGIN = "BadUser";
 
     private static Gson gson;

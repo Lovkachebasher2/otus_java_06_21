@@ -1,47 +1,59 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="en">
 <head>
-    <title>Пользователи</title>
+    <meta charset="UTF-8">
+    <title>Clients</title>
     <script>
         function postClientData()
         {
-            let obj = {};
-            obj.name = document.getElementById('clientNameTextBox').value
-            obj.phoneNumber = document.getElementById('clientPhoneNumberTextBox').value
-            obj.address = document.getElementById('clientAddressTextBox').value
+            const client = {
+                name: document.getElementById('clientNameTextBox').value,
+                address: {
+                    street: document.getElementById('clientAddressTextBox').value
+                },
+                phones: [
+                    {
+                        number: document.getElementById('clientPhoneNumberTextBox').value
+                    }
+                ]
+            }
             fetch('clients', {
                 method: "POST",
-                body: JSON.stringify(obj)
+                body: JSON.stringify(client)
             })
             window.location.reload();
         }
-
     </script>
 </head>
+<body>
 
-<body >
-<#list clients>
+<h4>List of clients:</h4>
 <table style="width: 400px">
     <thead>
     <tr>
-        <td style="width: 50px">Id</td>
-        <td style="width: 150px">Name</td>
-        <td style="width: 100px">Phone number</td>
-        <td style="width: 400px">Address</td>
+        <td style="width: 50px"><b>id</b></td>
+        <td style="width: 150px"><b>name</b></td>
+        <td style="width: 150px"><b>address</b></td>
+        <td style="width: 150px"><b>phones</b></td>
     </tr>
     </thead>
     <tbody>
-    <#items as client>
+    <#list clients as client>
     <tr>
         <td>${client.id}</td>
         <td>${client.name}</td>
-        <td>${client.phoneNumber}</td>
-        <td>${client.address}</td>
+        <td>${client.address.street}</td>
+        <td>
+            <#list client.phones as phone>
+            ${phone.number} <br>
+        </#list>
+        </td>
     </tr>
-    </#items>
+    </#list>
     </tbody>
 </table>
-</#list>
-<h4>Add client</h4>
+
+<h4>Save client:</h4>
 <form>
     <input type="text" id = "clientNameTextBox" placeholder="name">
     <input type="text" id = "clientPhoneNumberTextBox" placeholder="phone number">

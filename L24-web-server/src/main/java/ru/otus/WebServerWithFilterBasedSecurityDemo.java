@@ -7,7 +7,9 @@ import ru.otus.dao.core.repository.DataTemplateHibernate;
 import ru.otus.dao.core.repository.HibernateUtils;
 import ru.otus.dao.core.sessionmanager.TransactionManagerHibernate;
 import ru.otus.dao.crm.dbmigrations.MigrationsExecutorFlyway;
+import ru.otus.dao.crm.model.Address;
 import ru.otus.dao.crm.model.Client;
+import ru.otus.dao.crm.model.Phone;
 import ru.otus.dao.crm.model.User;
 import ru.otus.dao.crm.services.client.DBServiceClient;
 import ru.otus.dao.crm.services.client.DBServiceClientImpl;
@@ -47,7 +49,8 @@ public class WebServerWithFilterBasedSecurityDemo {
         new MigrationsExecutorFlyway(dbUrl, dbUserName, dbPassword).executeMigrations();
 
 
-        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, User.class, Client.class);
+        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class, User.class);
+
 
         var transactionManager = new TransactionManagerHibernate(sessionFactory);
 
