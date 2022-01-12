@@ -1,14 +1,15 @@
 package ru.otus.appcontainer;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
 import ru.otus.appcontainer.api.AppComponent;
 import ru.otus.appcontainer.api.AppComponentsContainer;
 import ru.otus.appcontainer.api.AppComponentsContainerConfig;
+import ru.otus.exception.BasedException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,32 +26,33 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     private void processConfig(Class<?> configClass) {
         checkConfigClass(configClass);
-        Reflections reflections = new Reflections(configClass, new MethodAnnotationsScanner());
-        Object instanceConfigClass = getInstance(configClass);
-        reflections.getMethodsAnnotatedWith(AppComponent.class).forEach(
-                method -> addComponent(instanceConfigClass, method)
-        );
-
+        addComponent(configClass);
     }
 
-    private void addComponent(Object instanceConfigClass, Method method) {
-        AppComponent appComponent = method.getAnnotation(AppComponent.class);//?
-        Class<?>[] parametersType = method.getParameterTypes();
-        int c = method.getParameterCount();
-        Object[] args = new Object[method.getParameterCount()];
-
-        for (int i = 0; i < parametersType.length; ++i) {
-            args[i] = getAppComponent(parametersType[i]);
-        }
-        Object result = null;
-        try {
-            result = method.invoke(instanceConfigClass, args);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        appComponentsByName.put(appComponent.name(), result);
-        appComponents.add(result);
+    private void addComponent(Class<?> clazz) {
+        Object instanceConfigClass = getInstance(clazz);
+        Method[] methods = clazz.getDeclaredMethods();
+        Arrays.stream(methods)
+                .filter(method -> method.isAnnotationPresent(AppComponent.class))
+                .sorted(Comparator.comparingInt(Method::getParameterCount))
+                .forEach(method -> {
+                    method.setAccessible(true);
+                    Class<?>[] parametersType = method.getParameterTypes();
+                    Object[] args = new Object[method.getParameterCount()];
+                    for (int i = 0; i < parametersType.length; ++i) {
+                        args[i] = getAppComponent(parametersType[i]);
+                    }
+                    Object result  = null;
+                    try {
+                        result = method.invoke(instanceConfigClass, args);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                       throw new BasedException(e.getMessage());
+                    }
+                    appComponentsByName.put(method.getName(), result);
+                    appComponents.add(result);
+                });
     }
+
 
 
     private Object getInstance(Class<?> clazz) {
@@ -69,7 +71,8 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     @Override
     public <C> C getAppComponent(Class<C> componentClass) {
-        return (C) getComponentByType(componentClass).orElse(null);
+        return (C) getComponentByType(componentClass).orElseThrow(() ->
+                new BasedException("can't find component by name: " + componentClass.getName()));
     }
 
     private Optional<Object> getComponentByType(Class<?> parameterType) {
@@ -81,7 +84,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     @Override
     public <C> C getAppComponent(String componentName) {
         if (!appComponentsByName.containsKey(componentName)) {
-            throw new IllegalArgumentException();
+            throw new BasedException("can't find component by name: " + componentName);
         }
         return (C) appComponentsByName.get(componentName);
     }
