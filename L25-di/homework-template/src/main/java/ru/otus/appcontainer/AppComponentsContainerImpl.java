@@ -34,7 +34,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
         Method[] methods = clazz.getDeclaredMethods();
         Arrays.stream(methods)
                 .filter(method -> method.isAnnotationPresent(AppComponent.class))
-                .sorted(Comparator.comparingInt(Method::getParameterCount))
+                .sorted(Comparator.comparingInt(value -> value.getAnnotation(AppComponentsContainerConfig.class).order()))
                 .forEach(method -> {
                     method.setAccessible(true);
                     Class<?>[] parametersType = method.getParameterTypes();
@@ -48,7 +48,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
                     } catch (IllegalAccessException | InvocationTargetException e) {
                        throw new BasedException(e.getMessage());
                     }
-                    appComponentsByName.put(method.getName(), result);
+                    appComponentsByName.put(method.getAnnotation(AppComponent.class).name(), result);
                     appComponents.add(result);
                 });
     }
