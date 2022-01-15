@@ -42,17 +42,19 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
                     for (int i = 0; i < parametersType.length; ++i) {
                         args[i] = getAppComponent(parametersType[i]);
                     }
-                    Object result  = null;
+                    Object result = null;
                     try {
                         result = method.invoke(instanceConfigClass, args);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                       throw new BasedException(e.getMessage());
+                        throw new BasedException(e.getMessage());
                     }
                     appComponentsByName.put(method.getAnnotation(AppComponent.class).name(), result);
+                    if (appComponents.contains(result)) {
+                        appComponents.remove(result);
+                    }
                     appComponents.add(result);
                 });
     }
-
 
 
     private Object getInstance(Class<?> clazz) {
