@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clients</title>
+    <script>
+        function postClientData()
+        {
+            const client = {
+                name: document.getElementById('clientNameTextBox').value,
+                address: {
+                    street: document.getElementById('clientAddressTextBox').value
+                },
+                phones: [
+                    {
+                        number: document.getElementById('clientPhoneNumberTextBox').value
+                    }
+                ]
+            }
+            fetch('clients', {
+                method: "POST",
+                body: JSON.stringify(client)
+            })
+            window.location.reload();
+        }
+    </script>
+</head>
+<body>
+
+<h4>List of clients:</h4>
+<table style="width: 400px">
+    <thead>
+    <tr>
+        <td style="width: 50px"><b>id</b></td>
+        <td style="width: 150px"><b>name</b></td>
+        <td style="width: 150px"><b>address</b></td>
+        <td style="width: 150px"><b>phones</b></td>
+    </tr>
+    </thead>
+    <tbody>
+    <#list clients as client>
+    <tr>
+        <td>${client.id}</td>
+        <td>${client.name}</td>
+        <td>${client.address.street}</td>
+        <td>
+            <#list client.phones as phone>
+            ${phone.number} <br>
+        </#list>
+        </td>
+    </tr>
+    </#list>
+    </tbody>
+</table>
+
+<h4>Save client:</h4>
+<form>
+    <input type="text" id = "clientNameTextBox" placeholder="name">
+    <input type="text" id = "clientPhoneNumberTextBox" placeholder="phone number">
+    <input type="text" id = "clientAddressTextBox" placeholder="address">
+    <input type="submit" value="Create" onclick="postClientData()"/>
+</form>
+</body>
+</html>
